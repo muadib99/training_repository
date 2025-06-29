@@ -4,6 +4,10 @@ def embed_with_pinecone():
         import json
         import random
         import string
+        from google import genai
+        import time
+        import gemini_record
+        from google import genai
         load_dotenv()
         pinecone_api=os.getenv("pinecone_api")
         gemini_api_key=os.getenv("gemma_gemini_api")
@@ -38,80 +42,14 @@ def embed_with_pinecone():
                 }
             )
 
-        """##sample embedding record format
-
-        """
-
-        # records= [
-        #     {
-        #             "_id": "rec97",
-        #             "chunk_text": "He suggested asking the Galactic AC about entropy reversal.",
-        #             "category": "document_analysis"
-        #         },
-        #         {
-        #             "_id": "rec98",
-        #             "chunk_text": "The AC-contact was small but connected to the Galactic AC.",
-        #             "category": "document_analysis"
-        #         },
-        #         {
-        #             "_id": "rec99",
-        #             "chunk_text": "MQ-17J wondered about seeing the Galactic AC someday.",
-        #             "category": "document_analysis"
-        #         }
-
-        #     ]
-        import gemini_record
         records= gemini_record.gemini_segement_sentences()
-        
-
-        """##upload embeddings to namespace"""
-
-        # Target the index
         dense_index = pc.Index(index_name)
-
-        # # Upsert the records into a namespace
         dense_index.upsert_records(namespace_name, records)
-
-        # Wait for the upserted vectors to be indexed
-        import time
         time.sleep(10)
 
-        # View stats for the index
-        stats = dense_index.describe_index_stats()
-        print(stats)
-
-        from google import genai
+        
 
         gemini_client = genai.Client(api_key=gemini_api_key)
-
-        """## upload the query findings to gemini"""
-
-        # Define the
-        #query = "how does the story end"
-
-        # # Search the dense index
-        # results = dense_index.search(
-        #     namespace="query-assimov-namespace",
-        #     query={
-        #         "top_k": 10,
-        #         "inputs": {
-        #             'text': query
-        #         }
-        #     }
-        # )
-
-        # # Print the results
-        # for hit in results['result']['hits']:
-        #         print(f"id: {hit['_id']:<5} | score: {round(hit['_score'], 2):<5} | category: {hit['fields']['category']:<10} | text: {hit['fields']['chunk_text']:<50}")
-
-        # hit_texts = []
-        # for hit in results['result']['hits']:
-        #     text = hit['fields'].get('chunk_text', '')
-        #     hit_texts.append(text)
-            #print(f"id: {hit['_id']:<5} | score: {round(hit['_score'], 2):<5} | category: {hit['fields']['category']:<10} | text: {text:<50}")
-
-        # combined_text = "\n".join(f"- {t}" for t in hit_texts)
-
 
         ##########################--------------------------##############################
         query = "does ac solve the problem of entropy reversal"
